@@ -18,11 +18,16 @@
         </activity>
 
         <provider
-            android:name=".provider.WeatherProvider"
+            android:name="ru.ifmo.md.lesson8.provider.WeatherProvider"
             android:authorities="ru.ifmo.md.lesson8.weather"
             android:enabled="true"
             android:exported="false" >
         </provider>
+
+        <service
+            android:name="ru.ifmo.md.lesson8.WeatherLoaderService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
