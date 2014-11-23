@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">Weather</string>
-    <string name="title_item_detail">Item Detail</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
