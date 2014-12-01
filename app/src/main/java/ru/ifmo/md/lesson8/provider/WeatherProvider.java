@@ -24,8 +24,8 @@ public class WeatherProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = WeatherContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, "cities", CITIES);
-        matcher.addURI(authority, "cities/#", CITIES_ID);
+        matcher.addURI(authority, "city", CITIES);
+        matcher.addURI(authority, "city/#", CITIES_ID);
 
         return matcher;
     }

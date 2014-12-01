@@ -36,6 +36,11 @@ public final class WeatherContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendEncodedPath(PATH_WEATHER).build();
 
+        public static final String[] COLUMNS_CITY_NAME = {
+                BaseColumns._ID,
+                CityColumns.CITY_NAME,
+        };
+
         public static Uri buildCityUri(String cityId) {
             return CONTENT_URI.buildUpon().appendPath(cityId).build();
         }

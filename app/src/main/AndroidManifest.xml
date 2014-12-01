@@ -7,6 +7,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!--
         <activity
             android:name="ru.ifmo.md.lesson8.TestActivity"
             android:label="@string/title_activity_test" >
@@ -16,7 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        -->
         <provider
             android:name="ru.ifmo.md.lesson8.provider.WeatherProvider"
             android:authorities="ru.ifmo.md.lesson8.weather"
@@ -28,6 +29,24 @@
             android:name="ru.ifmo.md.lesson8.WeatherLoaderService"
             android:exported="false" >
         </service>
+
+        <activity
+            android:name="ru.ifmo.md.lesson8.CityListActivity"
+            android:label="@string/title_city_list" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ru.ifmo.md.lesson8.CityDetailActivity"
+            android:label="@string/title_city_detail"
+            android:parentActivityName="ru.ifmo.md.lesson8.CityListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.ifmo.md.lesson8.CityListActivity" />
+        </activity>
     </application>
 
 </manifest>
