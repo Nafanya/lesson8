@@ -146,6 +146,10 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         String forecast = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_FORECAST));
         forecast = forecast.substring(1, forecast.length() - 2);
         String[] parts = forecast.split("\\$");
+        if (parts.length < 20) {
+            WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId, mReceiver);
+            return;
+        }
         for (int i = 0; i < parts.length; i += 4) {
             final String date = parts[i];
             final String icon = parts[i + 1];
