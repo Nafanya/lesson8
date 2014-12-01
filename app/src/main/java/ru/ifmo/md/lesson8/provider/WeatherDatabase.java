@@ -33,37 +33,54 @@ public class WeatherDatabase extends SQLiteOpenHelper {
                 + CityColumns.CITY_NAME + " TEXT NOT NULL,"
                 + CityColumns.CITY_LAST_UPDATE + " TEXT NOT NULL,"
                 + CityColumns.CITY_TEMPERATURE + " REAL NOT NULL,"
+                + CityColumns.CITY_HUMIDITY + " INTEGER NOT NULL,"
+                + CityColumns.CITY_WIND_SPEED + " INTEGER NOT NULL,"
+                + CityColumns.WEATHER_FORECAST + " TEXT NOT NULL,"
                 + CityColumns.WEATHER_CONDITION_ID + " INTEGER NOT NULL,"
                 + CityColumns.WEATHER_DESCRIPTION + " TEXT NOT NULL,"
                 + CityColumns.WEATHER_ICON_ID + " TEXT NOT NULL"
-                //+ CityColumns.WEATHER_MAIN + " TEXT NOT NULL"
                 + ");"
         );
 
-        db.execSQL("INSERT INTO " + Tables.CITIES + "(" +
-                CityColumns.CITY_ID + ", " +
-                CityColumns.CITY_NAME + ", " +
-                CityColumns.CITY_LAST_UPDATE + ", " +
-                CityColumns.CITY_TEMPERATURE + ", " +
-                CityColumns.WEATHER_CONDITION_ID + ", " +
-                CityColumns.WEATHER_DESCRIPTION + ", " +
-                CityColumns.WEATHER_ICON_ID +
-                //CityColumns.WEATHER_MAIN +
-                ") VALUES (" +
-                "498817, " +
-                DatabaseUtils.sqlEscapeString("Saint Petersburg") + ", " +
-                DatabaseUtils.sqlEscapeString("2014-11-24T15:00:00") + ", " +
-                "272.15, " +
-                "804, " +
-                DatabaseUtils.sqlEscapeString("overcast clouds") + ", " +
-                DatabaseUtils.sqlEscapeString("04n") +
-                ");"
-        );
+        db.execSQL(createEntry(
+                498817, "Saint Petersburg", "2014-11-24T15:00:00", -2.15, 804, "overcast clouds", "04n"));
+        db.execSQL(createEntry(
+                487846, "Stavropol", "2014-12-01T15:00:00", 3.15, 600, "light snow", "13n"));
+        db.execSQL(createEntry(
+                2643743, "London", "2014-12-01T15:41:14", 3.15, 721, "haze", "50d"));
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i2) {
 
+    }
+
+    private static String createEntry(int cityId, String cityName, String lastUpdate, double temperature,
+                                      int conditionId, String description, String iconId) {
+        return "INSERT INTO " + Tables.CITIES + "(" +
+                CityColumns.CITY_ID + ", " +
+                CityColumns.CITY_NAME + ", " +
+                CityColumns.CITY_LAST_UPDATE + ", " +
+                CityColumns.CITY_TEMPERATURE + ", " +
+                CityColumns.CITY_HUMIDITY + ", " +
+                CityColumns.CITY_WIND_SPEED + "," +
+                CityColumns.WEATHER_CONDITION_ID + ", " +
+                CityColumns.WEATHER_DESCRIPTION + ", " +
+                CityColumns.WEATHER_ICON_ID + ", " +
+                CityColumns.WEATHER_FORECAST +
+                ") VALUES (" +
+                cityId + ", " +
+                DatabaseUtils.sqlEscapeString(cityName) + ", " +
+                DatabaseUtils.sqlEscapeString(lastUpdate) + ", " +
+                Double.toString(temperature) + ", " +
+                "70, " +
+                "1," +
+                conditionId + ", " +
+                DatabaseUtils.sqlEscapeString(description) + ", " +
+                DatabaseUtils.sqlEscapeString(iconId) + ", " +
+                "'forecast'" +
+                ");";
     }
 
 

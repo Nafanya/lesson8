@@ -1,5 +1,7 @@
 package ru.ifmo.md.lesson8.provider;
 
+import android.database.Cursor;
+import android.database.CursorWrapper;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -16,10 +18,11 @@ public final class WeatherContract {
 
         String CITY_TEMPERATURE = "city_temperature";
         //String CITY_PRESSURE = "city_pressure";
-        //String CITY_HUMIDITY = "city_humidity";
-        //String CITY_WIND_SPEED = "city_wind";
+        String CITY_HUMIDITY = "city_humidity";
+        String CITY_WIND_SPEED = "city_wind";
         //String CITY_CLOUDS = "city_clouds";
 
+        String WEATHER_FORECAST = "weather_forecast";
         String WEATHER_CONDITION_ID = "weather_condition_id";
         String WEATHER_MAIN = "weather_main";
         String WEATHER_DESCRIPTION = "weather_description";
@@ -36,9 +39,23 @@ public final class WeatherContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendEncodedPath(PATH_WEATHER).build();
 
-        public static final String[] COLUMNS_CITY_NAME = {
+        public static final String[] BASE_COLUMNS = {
                 BaseColumns._ID,
                 CityColumns.CITY_NAME,
+        };
+
+        public static final String[] ALL_COLUMNS = {
+                BaseColumns._ID,
+                CityColumns.CITY_ID,
+                CityColumns.CITY_NAME,
+                CityColumns.CITY_LAST_UPDATE,
+                CityColumns.CITY_TEMPERATURE,
+                CityColumns.CITY_HUMIDITY,
+                CityColumns.CITY_WIND_SPEED,
+                CityColumns.WEATHER_CONDITION_ID,
+                CityColumns.WEATHER_DESCRIPTION ,
+                CityColumns.WEATHER_ICON_ID,
+                CityColumns.WEATHER_FORECAST
         };
 
         public static Uri buildCityUri(String cityId) {

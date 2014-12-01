@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-import ru.ifmo.md.lesson8.dummy.DummyContent;
 import ru.ifmo.md.lesson8.provider.WeatherContract;
 
 /**
@@ -58,8 +57,8 @@ public class CityListFragment extends ListFragment implements android.support.v4
             case LOADER_CITIES:
                 return new CursorLoader(
                         getActivity(),
-                        WeatherContract.City.buildCityUri(bundle.getString(EXTRA_CITY_ID)),
-                        WeatherContract.City.COLUMNS_CITY_NAME,
+                        WeatherContract.City.CONTENT_URI,
+                        WeatherContract.City.BASE_COLUMNS,
                         null, null, null);
             default:
                 throw new UnsupportedOperationException("Unknown loader");
@@ -131,9 +130,7 @@ public class CityListFragment extends ListFragment implements android.support.v4
         };
         setListAdapter(mAdapter);
 
-        Bundle args = new Bundle();
-        args.putString(EXTRA_CITY_ID, "1");
-        getLoaderManager().initLoader(LOADER_CITIES, args, this);
+        getLoaderManager().initLoader(LOADER_CITIES, Bundle.EMPTY, this);
     }
 
     @Override
@@ -173,7 +170,7 @@ public class CityListFragment extends ListFragment implements android.support.v4
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onItemSelected(Long.toString(id));
     }
 
     @Override
