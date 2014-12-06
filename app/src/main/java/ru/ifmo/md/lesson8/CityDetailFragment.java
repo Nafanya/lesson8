@@ -135,6 +135,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         }
         final int currentWeatherIconId = getImageById(
                 mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_ICON_ID)));
+        final String weatherDesc = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_DESCRIPTION));
         final String cityName = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.CITY_NAME));
         final double temp = mItemCursor.getDouble(mItemCursor.getColumnIndex(WeatherContract.City.CITY_TEMPERATURE));
         final String temperature = String.format("%.1f°", temp);
@@ -146,6 +147,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
 
         ((ImageView) mRootView.findViewById(R.id.detail_weather_icon))
                 .setImageBitmap(BitmapFactory.decodeResource(getResources(), currentWeatherIconId));
+        ((TextView) mRootView.findViewById(R.id.weather_desc)).setText(weatherDesc);
         ((TextView) mRootView.findViewById(R.id.detail_city_name)).setText(cityName);
         ((TextView) mRootView.findViewById(R.id.detail_temperature)).setText(temperature);
         ((TextView) mRootView.findViewById(R.id.detail_last_update)).setText(lastUpdate);
