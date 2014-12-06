@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -133,6 +134,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         if (mItemCursor == null) {
             return;
         }
+        long start = System.currentTimeMillis();
         final int currentWeatherIconId = getImageById(
                 mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_ICON_ID)));
         final String weatherDesc = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_DESCRIPTION));
@@ -202,6 +204,8 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         } catch (ArrayIndexOutOfBoundsException e) {
             return;
         }
+        long tm = System.currentTimeMillis() - start;
+        Log.d("TAG", "Updating UI took " + tm + " ms");
     }
 
     private int getImageById(String icon) {

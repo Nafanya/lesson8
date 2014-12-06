@@ -20,6 +20,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:padding="@dimen/internal_padding"
                 android:id="@+id/detail_city_name"
                 style="?android:attr/textAppearanceLarge" />
 
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/weather_desc"
                 android:gravity="center"
+                android:padding="@dimen/internal_padding"
                 style="?android:attr/textAppearanceLarge"/>
             </LinearLayout>
 
@@ -53,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/detail_temperature"
                 android:layout_gravity="center"
+                android:gravity="center"
                 style="?android:attr/textAppearanceLarge"/>
 
             <ImageView
@@ -62,15 +65,15 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/humidity"
                 android:contentDescription="@null"
-                android:padding="8dp"/>
+                android:padding="@dimen/internal_padding"/>
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="8dp"
-                android:gravity="left"
+                android:padding="@dimen/internal_padding"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:id="@+id/humidity"
                 style="?android:attr/textAppearanceLarge"/>
 
@@ -81,14 +84,14 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/wind2"
                 android:contentDescription="@null"
-                android:padding="8dp"/>
+                android:padding="@dimen/internal_padding"/>
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="8dp"
-                android:gravity="left"
+                android:padding="@dimen/internal_padding"
+                android:gravity="center"
                 android:layout_gravity="center"
                 android:id="@+id/windSpeed"
                 style="?android:attr/textAppearanceLarge"/>
@@ -105,7 +108,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/internal_padding"
             android:text="@string/forecast"
             android:gravity="center"
             style="?android:attr/textAppearanceLarge"/>
@@ -126,7 +129,7 @@
                     android:id="@+id/weather_icon_1"
                     android:scaleType="center"
                     android:contentDescription="@null"
-                    android:padding="8dp"
+                    android:padding="@dimen/internal_padding"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -166,7 +169,7 @@
                     android:id="@+id/weather_icon_2"
                     android:scaleType="center"
                     android:contentDescription="@null"
-                    android:padding="8dp"
+                    android:padding="@dimen/internal_padding"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -206,7 +209,7 @@
                     android:id="@+id/weather_icon_3"
                     android:scaleType="center"
                     android:contentDescription="@null"
-                    android:padding="8dp"
+                    android:padding="@dimen/internal_padding"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -246,7 +249,7 @@
                     android:id="@+id/weather_icon_4"
                     android:scaleType="center"
                     android:contentDescription="@null"
-                    android:padding="8dp"
+                    android:padding="@dimen/internal_padding"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -286,7 +289,7 @@
                     android:id="@+id/weather_icon_5"
                     android:scaleType="center"
                     android:contentDescription="@null"
-                    android:padding="8dp"
+                    android:padding="@dimen/internal_padding"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"

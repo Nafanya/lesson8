@@ -64,6 +64,7 @@ public class CityListActivity extends ActionBarActivity
             CityDetailFragment fragment = new CityDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .replace(R.id.city_detail_container, fragment)
                     .commit();
 

@@ -47,7 +47,7 @@
                 android:padding="@dimen/internal_padding"
                 android:adjustViewBounds="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/w09n"
+                android:src="@drawable/w02d"
                 android:id="@+id/detail_weather_icon"
                 android:contentDescription="@null"/>
 
@@ -57,10 +57,10 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/internal_padding"
                 android:id="@+id/detail_temperature"
-                android:text="3C"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="50sp"/>
+                android:textSize="50sp"
+                style="?android:attr/textAppearanceLarge"/>
 
             </LinearLayout>
 
