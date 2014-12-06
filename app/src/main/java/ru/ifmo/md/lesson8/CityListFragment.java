@@ -1,38 +1,38 @@
 package ru.ifmo.md.lesson8;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
 import ru.ifmo.md.lesson8.provider.WeatherContract;
 
-/**
- * A list fragment representing a list of Cities. This fragment
- * also supports tablet devices by allowing list items to be given an
- * 'activated' state upon selection. This helps indicate which item is
- * currently being viewed in a {@link CityDetailFragment}.
- * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
- */
-public class CityListFragment extends ListFragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+
+public class CityListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,MyContentObserver.Callbacks {
 
     private static final int LOADER_CITIES = 0;
 
     public static final String EXTRA_CITY_ID = "ru.ifmo.md.lesson8.weather.extra.CITY_ID";
 
     private CursorAdapter mAdapter;
+    private MyContentObserver mObserver = null;
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -40,10 +40,6 @@ public class CityListFragment extends ListFragment implements android.support.v4
      */
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
-    /**
-     * The fragment's current callback object, which is notified of list item
-     * clicks.
-     */
     private Callbacks mCallbacks = sDummyCallbacks;
 
     /**
@@ -58,13 +54,12 @@ public class CityListFragment extends ListFragment implements android.support.v4
                 return new CursorLoader(
                         getActivity(),
                         WeatherContract.City.CONTENT_URI,
-                        WeatherContract.City.BASE_COLUMNS,
+                        WeatherContract.City.NAME_COLUMNS,
                         null, null, null);
             default:
                 throw new UnsupportedOperationException("Unknown loader");
         }
     }
-
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
@@ -76,32 +71,21 @@ public class CityListFragment extends ListFragment implements android.support.v4
 
     }
 
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
+    @Override
+    public void onObserverFired() {
+        getLoaderManager().initLoader(LOADER_CITIES, null, this).forceLoad();
+    }
+
     public interface Callbacks {
-        /**
-         * Callback for when an item has been selected.
-         */
         public void onItemSelected(String id);
     }
 
-    /**
-     * A dummy implementation of the {@link Callbacks} interface that does
-     * nothing. Used only when this fragment is not attached to an activity.
-     */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(String id) {
         }
     };
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public CityListFragment() {
     }
 
@@ -109,6 +93,24 @@ public class CityListFragment extends ListFragment implements android.support.v4
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_cities, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                showCitySelectDialog();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -165,6 +167,26 @@ public class CityListFragment extends ListFragment implements android.support.v4
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (mObserver == null) {
+            mObserver = new MyContentObserver(this);
+        }
+        getActivity().getContentResolver().registerContentObserver(
+                WeatherContract.City.CONTENT_URI, true, mObserver);
+        getLoaderManager().initLoader(LOADER_CITIES, null, this).forceLoad();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().getContentResolver().unregisterContentObserver(mObserver);
+        if (mObserver != null) {
+            mObserver = null;
+        }
+    }
+
+    @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
@@ -202,5 +224,27 @@ public class CityListFragment extends ListFragment implements android.support.v4
         }
 
         mActivatedPosition = position;
+    }
+
+    private void showCitySelectDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        final EditText editText = new EditText(getActivity());
+
+        builder.setMessage(R.string.choose_city)
+                .setView(editText)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        WeatherLoaderService.startActionAddNewCity(
+                                getActivity(), editText.getText().toString());
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        builder.show();
     }
 }

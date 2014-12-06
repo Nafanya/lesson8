@@ -8,5 +8,7 @@
     <string name="title_city_detail">Weather</string>
     <string name="forecast">Forecast</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_add">Add new city</string>
+    <string name="choose_city">Choose city</string>
 
 </resources>

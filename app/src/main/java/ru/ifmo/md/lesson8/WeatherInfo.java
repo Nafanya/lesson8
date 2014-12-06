@@ -6,6 +6,8 @@ import java.util.ArrayList;
  * Created by Nikita Yaschenko on 01.12.14.
  */
 public class WeatherInfo {
+    private int mCityId;
+    private String mCityName;
     private int mTemperature;
     private int mHumidity;
     private double mWindSpeed;
@@ -13,6 +15,22 @@ public class WeatherInfo {
     private String mIcon;
     private String mLastUpdate;
     private ArrayList<WeatherDay> mForecast;
+
+    public String getCityName() {
+        return mCityName;
+    }
+
+    public void setCityName(String cityName) {
+        mCityName = cityName;
+    }
+
+    public int getCityId() {
+        return mCityId;
+    }
+
+    public void setCityId(int cityId) {
+        mCityId = cityId;
+    }
 
     public WeatherInfo() {
         mForecast = new ArrayList<WeatherDay>();

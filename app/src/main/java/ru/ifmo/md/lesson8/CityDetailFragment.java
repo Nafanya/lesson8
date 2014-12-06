@@ -143,52 +143,6 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         final String humidity = mItemCursor.getInt(mItemCursor.getColumnIndex(WeatherContract.City.CITY_HUMIDITY)) + "%";
         final String windSpeed = mItemCursor.getInt(mItemCursor.getColumnIndex(WeatherContract.City.CITY_WIND_SPEED)) + "m/s";
 
-        String forecast = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_FORECAST));
-        forecast = forecast.substring(1, forecast.length() - 2);
-        String[] parts = forecast.split("\\$");
-        if (parts.length < 20) {
-            WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId, mReceiver);
-            return;
-        }
-        for (int i = 0; i < parts.length; i += 4) {
-            final String date = parts[i];
-            final String icon = parts[i + 1];
-            final String tempr = parts[i + 2] + "° ... " + parts[i + 3] + "°";
-            int index = i / 4;
-            switch (index) {
-                case 0:
-                    ((TextView) mRootView.findViewById(R.id.temperature_1)).setText(tempr);
-                    ((TextView) mRootView.findViewById(R.id.last_update_1)).setText(date);
-                    ((ImageView) mRootView.findViewById(R.id.weather_icon_1))
-                            .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
-                    break;
-                case 1:
-                    ((TextView) mRootView.findViewById(R.id.temperature_2)).setText(tempr);
-                    ((TextView) mRootView.findViewById(R.id.last_update_2)).setText(date);
-                    ((ImageView) mRootView.findViewById(R.id.weather_icon_2))
-                            .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
-                    break;
-                case 2:
-                    ((TextView) mRootView.findViewById(R.id.temperature_3)).setText(tempr);
-                    ((TextView) mRootView.findViewById(R.id.last_update_3)).setText(date);
-                    ((ImageView) mRootView.findViewById(R.id.weather_icon_3))
-                            .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
-                    break;
-                case 3:
-                    ((TextView) mRootView.findViewById(R.id.temperature_4)).setText(tempr);
-                    ((TextView) mRootView.findViewById(R.id.last_update_4)).setText(date);
-                    ((ImageView) mRootView.findViewById(R.id.weather_icon_4))
-                            .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
-                    break;
-                case 4:
-                    ((TextView) mRootView.findViewById(R.id.temperature_5)).setText(tempr);
-                    ((TextView) mRootView.findViewById(R.id.last_update_5)).setText(date);
-                    ((ImageView) mRootView.findViewById(R.id.weather_icon_5))
-                            .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
-                    break;
-            }
-        }
-
         ((ImageView) mRootView.findViewById(R.id.detail_weather_icon))
                 .setImageBitmap(BitmapFactory.decodeResource(getResources(), currentWeatherIconId));
         ((TextView) mRootView.findViewById(R.id.detail_city_name)).setText(cityName);
@@ -196,6 +150,55 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         ((TextView) mRootView.findViewById(R.id.detail_last_update)).setText(lastUpdate);
         ((TextView) mRootView.findViewById(R.id.windSpeed)).setText(windSpeed);
         ((TextView) mRootView.findViewById(R.id.humidity)).setText(humidity);
+
+        String forecast = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_FORECAST));
+        if (forecast == null || !forecast.contains("$")) {
+            WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId, mReceiver);
+            return;
+        }
+        String[] parts = forecast.split("\\$");
+        try {
+            for (int i = 0; i < 24; i += 4) {
+                final String date = parts[i];
+                final String icon = parts[i + 1];
+                final String tempr = parts[i + 2] + "° ... " + parts[i + 3] + "°";
+                int index = i / 4;
+                switch (index) {
+                    case 0:
+                        ((TextView) mRootView.findViewById(R.id.temperature_1)).setText(tempr);
+                        ((TextView) mRootView.findViewById(R.id.last_update_1)).setText(date);
+                        ((ImageView) mRootView.findViewById(R.id.weather_icon_1))
+                                .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
+                        break;
+                    case 1:
+                        ((TextView) mRootView.findViewById(R.id.temperature_2)).setText(tempr);
+                        ((TextView) mRootView.findViewById(R.id.last_update_2)).setText(date);
+                        ((ImageView) mRootView.findViewById(R.id.weather_icon_2))
+                                .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
+                        break;
+                    case 2:
+                        ((TextView) mRootView.findViewById(R.id.temperature_3)).setText(tempr);
+                        ((TextView) mRootView.findViewById(R.id.last_update_3)).setText(date);
+                        ((ImageView) mRootView.findViewById(R.id.weather_icon_3))
+                                .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
+                        break;
+                    case 3:
+                        ((TextView) mRootView.findViewById(R.id.temperature_4)).setText(tempr);
+                        ((TextView) mRootView.findViewById(R.id.last_update_4)).setText(date);
+                        ((ImageView) mRootView.findViewById(R.id.weather_icon_4))
+                                .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
+                        break;
+                    case 4:
+                        ((TextView) mRootView.findViewById(R.id.temperature_5)).setText(tempr);
+                        ((TextView) mRootView.findViewById(R.id.last_update_5)).setText(date);
+                        ((ImageView) mRootView.findViewById(R.id.weather_icon_5))
+                                .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
+                        break;
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return;
+        }
     }
 
     private int getImageById(String icon) {

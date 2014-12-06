@@ -3,6 +3,7 @@ package ru.ifmo.md.lesson8;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 
 
 /**
@@ -21,7 +22,7 @@ import android.support.v4.app.FragmentActivity;
  * {@link CityListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class CityListActivity extends FragmentActivity
+public class CityListActivity extends ActionBarActivity
         implements CityListFragment.Callbacks {
 
     private boolean mTwoPane;
