@@ -19,6 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import ru.ifmo.md.lesson8.provider.WeatherContract;
 
 /**
@@ -164,14 +170,22 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         String[] parts = forecast.split("\\$");
         try {
             for (int i = 0; i < 24; i += 4) {
-                final String date = parts[i];
+                String date = parts[i];
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+                SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
+                try {
+                    Date dt = dateFormat.parse(date);
+                    date = toTitleCase(dayOfWeekFormat.format(dt));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 final String icon = parts[i + 1];
                 final String tempr = parts[i + 2] + "° ... " + parts[i + 3] + "°";
                 int index = i / 4;
                 switch (index) {
                     case 0:
                         ((TextView) mRootView.findViewById(R.id.temperature_1)).setText(tempr);
-                        ((TextView) mRootView.findViewById(R.id.last_update_1)).setText(date);
+                        ((TextView) mRootView.findViewById(R.id.last_update_1)).setText("Tomorrow");
                         ((ImageView) mRootView.findViewById(R.id.weather_icon_1))
                                 .setImageBitmap(BitmapFactory.decodeResource(getResources(), getImageById(icon)));
                         break;
@@ -206,6 +220,12 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         }
         long tm = System.currentTimeMillis() - start;
         Log.d("TAG", "Updating UI took " + tm + " ms");
+    }
+
+    private String toTitleCase(String s) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toUpperCase(s.charAt(0))).append(s.subSequence(1, s.length()).toString().toLowerCase());
+        return sb.toString();
     }
 
     private int getImageById(String icon) {
