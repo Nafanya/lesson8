@@ -49,6 +49,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        setRetainInstance(true);
 
         if (getArguments().containsKey(ARG_CITY_ID)) {
             Bundle args = new Bundle();

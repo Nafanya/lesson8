@@ -117,7 +117,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mAdapter = new CursorAdapter(getActivity(), null, true) {
+        mAdapter = new CursorAdapter(getActivity(), null, false) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 return LayoutInflater.from(context).inflate(
