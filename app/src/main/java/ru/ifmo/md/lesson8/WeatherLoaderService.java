@@ -113,6 +113,7 @@ public class WeatherLoaderService extends IntentService {
             cv.put(WeatherContract.City.CITY_TEMPERATURE, weather.getTemperature());
             cv.put(WeatherContract.City.CITY_WIND_SPEED, weather.getWindSpeed());
             cv.put(WeatherContract.City.WEATHER_DESCRIPTION, weather.getWeatherDescription());
+            cv.put(WeatherContract.City.WEATHER_ICON_ID, weather.getIcon());
             StringBuilder builder = new StringBuilder();
             for (WeatherDay day : weather.getForecast()) {
                 builder.append(day.getDate());

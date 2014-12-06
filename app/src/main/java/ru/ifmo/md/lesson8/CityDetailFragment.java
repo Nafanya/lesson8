@@ -134,6 +134,8 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         if (mItemCursor == null) {
             return;
         }
+        final int currentWeatherIconId = getImageById(
+                mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_ICON_ID)));
         final String cityName = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.CITY_NAME));
         final double temp = mItemCursor.getDouble(mItemCursor.getColumnIndex(WeatherContract.City.CITY_TEMPERATURE));
         final String temperature = String.format("%.1f°", temp);
@@ -153,7 +155,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         for (int i = 0; i < parts.length; i += 4) {
             final String date = parts[i];
             final String icon = parts[i + 1];
-            final String tempr = parts[i + 2] + "° - " + parts[i + 3] + "°";
+            final String tempr = parts[i + 2] + "° ... " + parts[i + 3] + "°";
             int index = i / 4;
             switch (index) {
                 case 0:
@@ -189,13 +191,13 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
             }
         }
 
+        ((ImageView) mRootView.findViewById(R.id.detail_weather_icon))
+                .setImageBitmap(BitmapFactory.decodeResource(getResources(), currentWeatherIconId));
         ((TextView) mRootView.findViewById(R.id.detail_city_name)).setText(cityName);
         ((TextView) mRootView.findViewById(R.id.detail_temperature)).setText(temperature);
         ((TextView) mRootView.findViewById(R.id.detail_last_update)).setText(lastUpdate);
         ((TextView) mRootView.findViewById(R.id.windSpeed)).setText(windSpeed);
         ((TextView) mRootView.findViewById(R.id.humidity)).setText(humidity);
-
-
     }
 
     private int getImageById(String icon) {
