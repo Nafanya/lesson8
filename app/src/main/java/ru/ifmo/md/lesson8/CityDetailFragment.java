@@ -1,6 +1,5 @@
 package ru.ifmo.md.lesson8;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import ru.ifmo.md.lesson8.provider.WeatherContract;
@@ -72,7 +70,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_test, menu);
+        inflater.inflate(R.menu.menu_detail, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
