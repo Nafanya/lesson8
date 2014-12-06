@@ -18,6 +18,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/internal_padding"
                 android:gravity="center"
                 android:id="@+id/detail_city_name"
                 style="?android:attr/textAppearanceLarge" />
@@ -26,6 +27,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/internal_padding"
                 android:id="@+id/weather_desc"
                 android:gravity="center"
                 style="?android:attr/textAppearanceLarge"/>
@@ -42,7 +44,10 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:scaleType="center"
+                android:padding="@dimen/internal_padding"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/w09n"
                 android:id="@+id/detail_weather_icon"
                 android:contentDescription="@null"/>
 
@@ -50,9 +55,12 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/internal_padding"
                 android:id="@+id/detail_temperature"
+                android:text="3C"
                 android:layout_gravity="center"
-                style="?android:attr/textAppearanceLarge"/>
+                android:gravity="center"
+                android:textSize="50sp"/>
 
             </LinearLayout>
 
