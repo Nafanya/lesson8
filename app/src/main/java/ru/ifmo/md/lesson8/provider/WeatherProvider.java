@@ -112,7 +112,7 @@ public class WeatherProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        notifyChange(uri);
+        notifyChange(City.CONTENT_URI);
         return rowsUpdated;
     }
 

@@ -14,6 +14,7 @@ import android.sax.Element;
 import android.sax.EndElementListener;
 import android.sax.RootElement;
 import android.sax.StartElementListener;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Xml;
 
@@ -213,14 +214,13 @@ public class WeatherLoaderService extends IntentService {
             weather = loadWeather(cityWeatherId);
         } catch (IOException | SAXException e) {
             e.printStackTrace();
-            //mReceiver.send(1, Bundle.EMPTY);
             return;
         }
 
         ContentValues values = fillValues(weather);
         getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
-
-        //mReceiver.send(0, Bundle.EMPTY);
+        Intent intent = new Intent("update");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void handleActionAddNewCity(double latitude, double longitude) {

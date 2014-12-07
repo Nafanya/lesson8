@@ -28,7 +28,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.util.List;
 
 import ru.ifmo.md.lesson8.provider.WeatherContract;

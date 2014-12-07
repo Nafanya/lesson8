@@ -1,5 +1,9 @@
 package ru.ifmo.md.lesson8;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -8,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +45,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
     private View mRootView;
     private String mCityId;
     private String mCityWeatherId;
+    private BroadcastReceiver mMessageReceiver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -73,6 +79,21 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         return mRootView;
     }
 
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mMessageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent)  {
+                Log.d("TAG", "Got broadcast update");
+                Bundle args = new Bundle();
+                mCityId = getArguments().getString(ARG_CITY_ID);
+                args.putString(ARG_CITY_ID, mCityId);
+                getLoaderManager().restartLoader(LOADER_CITY, args, CityDetailFragment.this);
+            }
+        };
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("update"));
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_detail, menu);
@@ -96,6 +117,12 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
     public void onResume() {
         super.onResume();
         getLoaderManager().initLoader(LOADER_CITY, null, this).forceLoad();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
