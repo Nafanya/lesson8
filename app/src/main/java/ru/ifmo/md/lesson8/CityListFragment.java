@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.util.List;
@@ -156,13 +157,15 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
 
         getLoaderManager().initLoader(LOADER_CITIES, Bundle.EMPTY, this);
 
-        final long lastUpdate = getLastUpdate(getActivity());
+        //final long lastUpdate = getLastUpdate(getActivity());
         //if (System.currentTimeMillis() - lastUpdate > UPDATE_FREQ) {
-            double[] coordinates = getLastLocation();
-            if (coordinates != null) {
-                setLastUpdate(getActivity(), System.currentTimeMillis());
-                WeatherLoaderService.startActionAddNewCity(getActivity(), coordinates[0], coordinates[1]);
-            }
+        double[] coordinates = getLastLocation();
+        if (coordinates != null) {
+            setLastUpdate(getActivity(), System.currentTimeMillis());
+            WeatherLoaderService.startActionAddNewCity(getActivity(), coordinates[0], coordinates[1]);
+        } else {
+            Toast.makeText(getActivity(), "Your current location isn't available now", Toast.LENGTH_LONG).show();
+        }
         //}
     }
 
@@ -188,7 +191,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             coordinates[1] = location.getLongitude();
             if (Math.abs(coordinates[0] - 59.89) < 0.3 && Math.abs(30.26 - coordinates[1]) < 0.3) {
                 coordinates[0] = 59.89;
-                coordinates[1] = 30.26;
+                coordinates[1] = 30.27;
             }
         }
         return coordinates;
@@ -322,11 +325,10 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
 
     private void showCitySelectDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
 
         final EditText editText = new EditText(getActivity());
 
-        builder.setMessage(R.string.choose_city)
+        builder.setTitle(R.string.choose_city)
                 .setView(editText)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

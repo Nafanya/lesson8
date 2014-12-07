@@ -232,7 +232,6 @@ public class WeatherLoaderService extends IntentService {
             // TODO: receiver
             return;
         }
-        setCurrentCity(getApplicationContext(), weather.getCityId());
         addCity(weather);
     }
 
@@ -245,17 +244,20 @@ public class WeatherLoaderService extends IntentService {
                 null);
         int count = cursor.getCount();
         cursor.close();
-        if (count > 0) {
-            //TODO: already exists
-            return;
-        }
+
         String cityId = Integer.toString(weather.getCityId());
         try {
             weather = loadWeather(cityId);
-            ContentValues values = fillValues(weather);
-            getContentResolver().insert(WeatherContract.City.CONTENT_URI, values);
         } catch (IOException | SAXException e) {
             e.printStackTrace();
+            return;
+        }
+        setCurrentCity(getApplicationContext(), weather.getCityId());
+        ContentValues values = fillValues(weather);
+        if (count > 0) {
+            getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
+        } else {
+            getContentResolver().insert(WeatherContract.City.CONTENT_URI, values);
         }
     }
 
