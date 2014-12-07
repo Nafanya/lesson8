@@ -56,7 +56,7 @@ public class WeatherLoaderService extends IntentService {
     private static final String CURRENT_FORMAT = "http://api.openweathermap.org/data/2.5/weather?id=%s&mode=xml&units=metric";
     private static final String LOCATION_FORMAT = "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&mode=xml&units=metric";
 
-    private ResultReceiver mReceiver;
+    //private ResultReceiver mReceiver;
 
 
     public static void startActionAddNewCity(Context context, String cityName) {
@@ -74,9 +74,14 @@ public class WeatherLoaderService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startActionUpdateCity(Context context, String cityId, String cityWeatherId, MyResultReceiver receiver) {
+    public static void startActionUpdateAll(Context context) {
         Intent intent = new Intent(context, WeatherLoaderService.class);
-        intent.putExtra(EXTRA_RECEIVER, receiver);
+        intent.setAction(ACTION_UPDATE_ALL);
+        context.startService(intent);
+    }
+
+    public static void startActionUpdateCity(Context context, String cityId, String cityWeatherId) {
+        Intent intent = new Intent(context, WeatherLoaderService.class);
         intent.setAction(ACTION_UPDATE_CITY);
         intent.putExtra(EXTRA_CITY_ID, cityId);
         intent.putExtra(EXTRA_CITY_WEATHER_ID, cityWeatherId);
@@ -146,7 +151,7 @@ public class WeatherLoaderService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            mReceiver = intent.getParcelableExtra(EXTRA_RECEIVER);
+            //mReceiver = intent.getParcelableExtra(EXTRA_RECEIVER);
             final String action = intent.getAction();
             switch (action) {
                 case ACTION_ADD_CITY_BY_NAME:
@@ -208,14 +213,14 @@ public class WeatherLoaderService extends IntentService {
             weather = loadWeather(cityWeatherId);
         } catch (IOException | SAXException e) {
             e.printStackTrace();
-            mReceiver.send(1, Bundle.EMPTY);
+            //mReceiver.send(1, Bundle.EMPTY);
             return;
         }
 
         ContentValues values = fillValues(weather);
         getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
 
-        mReceiver.send(0, Bundle.EMPTY);
+        //mReceiver.send(0, Bundle.EMPTY);
     }
 
     private void handleActionAddNewCity(double latitude, double longitude) {

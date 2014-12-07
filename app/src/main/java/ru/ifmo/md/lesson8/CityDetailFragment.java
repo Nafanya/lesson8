@@ -31,12 +31,11 @@ import ru.ifmo.md.lesson8.provider.WeatherContract;
  * in two-pane mode (on tablets) or a {@link CityDetailActivity}
  * on handsets.
  */
-public class CityDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,MyResultReceiver.Receiver {
+public class CityDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String ARG_CITY_ID = "city_id";
     private static final int LOADER_CITY = 0;
 
-    private MyResultReceiver mReceiver;
     private Cursor mItemCursor;
     private View mRootView;
     private String mCityId;
@@ -85,7 +84,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 if (mCityId != null && mCityWeatherId != null) {
-                    WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId, mReceiver);
+                    WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId);
                 }
                 return true;
             default:
@@ -96,15 +95,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onResume() {
         super.onResume();
-        mReceiver = new MyResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
         getLoaderManager().initLoader(LOADER_CITY, null, this).forceLoad();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mReceiver.setReceiver(null);
     }
 
     @Override
@@ -162,7 +153,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
 
         String forecast = mItemCursor.getString(mItemCursor.getColumnIndex(WeatherContract.City.WEATHER_FORECAST));
         if (forecast == null || !forecast.contains("$")) {
-            WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId, mReceiver);
+            WeatherLoaderService.startActionUpdateCity(getActivity(), mCityId, mCityWeatherId);
             return;
         }
         String[] parts = forecast.split("\\$");
@@ -248,8 +239,4 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
         }
     }
 
-    @Override
-    public void onReceiveResult(int resultCode, Bundle data) {
-        getLoaderManager().initLoader(LOADER_CITY, null, this).forceLoad();
-    }
 }

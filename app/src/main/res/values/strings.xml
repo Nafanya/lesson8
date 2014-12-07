@@ -10,6 +10,8 @@
     <string name="action_add">Add new city</string>
     <string name="choose_city">Choose city</string>
     <string name="action_set_update">Set update frequency</string>
+    <string name="delete">Delete</string>
+    <string name="action_update_all">Update all</string>
 
     <string-array name="update_interval_choices">
         <item>Never</item>

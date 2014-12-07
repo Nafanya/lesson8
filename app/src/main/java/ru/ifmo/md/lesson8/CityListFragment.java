@@ -15,12 +15,14 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -118,6 +120,9 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             case R.id.action_set_update:
                 showUpdateIntervalDialog();
                 return true;
+            case R.id.action_update_all:
+                WeatherLoaderService.startActionUpdateAll(getActivity());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -147,17 +152,18 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             }
         };
         setListAdapter(mAdapter);
+        registerForContextMenu(getListView());
 
         getLoaderManager().initLoader(LOADER_CITIES, Bundle.EMPTY, this);
 
         final long lastUpdate = getLastUpdate(getActivity());
-        if (System.currentTimeMillis() - lastUpdate > UPDATE_FREQ) {
+        //if (System.currentTimeMillis() - lastUpdate > UPDATE_FREQ) {
             double[] coordinates = getLastLocation();
             if (coordinates != null) {
                 setLastUpdate(getActivity(), System.currentTimeMillis());
                 WeatherLoaderService.startActionAddNewCity(getActivity(), coordinates[0], coordinates[1]);
             }
-        }
+        //}
     }
 
     private double[] getLastLocation() {
@@ -258,6 +264,29 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         mCallbacks.onItemSelected(Long.toString(id));
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.menu_context_cities, menu);
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo acmi =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.delete:
+                Cursor cursor = (Cursor) getListAdapter().getItem(acmi.position);
+                final String cityId = cursor.getString(cursor.getColumnIndex(WeatherContract.City._ID));
+                Log.d("TAG", "delete city id=" + cityId);
+                getActivity().getContentResolver().delete(
+                        WeatherContract.City.buildCityUri(cityId), null, null);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
