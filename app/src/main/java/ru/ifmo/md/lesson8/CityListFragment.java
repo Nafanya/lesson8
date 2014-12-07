@@ -36,7 +36,6 @@ import ru.ifmo.md.lesson8.provider.WeatherContract;
 public class CityListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,MyContentObserver.Callbacks {
 
     private static final int LOADER_CITIES = 0;
-    private static final long UPDATE_FREQ = 1000 * 60 * 10;
 
     public static final String EXTRA_CITY_ID = "ru.ifmo.md.lesson8.weather.extra.CITY_ID";
 
@@ -156,16 +155,12 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
 
         getLoaderManager().initLoader(LOADER_CITIES, Bundle.EMPTY, this);
 
-        //final long lastUpdate = getLastUpdate(getActivity());
-        //if (System.currentTimeMillis() - lastUpdate > UPDATE_FREQ) {
         double[] coordinates = getLastLocation();
         if (coordinates != null) {
-            setLastUpdate(getActivity(), System.currentTimeMillis());
             WeatherLoaderService.startActionAddNewCity(getActivity(), coordinates[0], coordinates[1]);
         } else {
             Toast.makeText(getActivity(), "Your current location isn't available now", Toast.LENGTH_LONG).show();
         }
-        //}
     }
 
     private double[] getLastLocation() {
@@ -357,6 +352,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
                             public void onClick(DialogInterface dialogInterface, int index) {
                                 boolean isAlarmOn = WeatherLoaderService.isServiceAlarmOn(getActivity());
                                 if (index == 0) {
+                                    WeatherLoaderService.setInterval(getActivity(), WeatherLoaderService.INTERVAL_NONE);
                                     if (isAlarmOn) {
                                         WeatherLoaderService.setServiceAlarm(getActivity(), false);
                                     }
