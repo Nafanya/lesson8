@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
@@ -18,7 +17,6 @@ import android.sax.StartElementListener;
 import android.util.Log;
 import android.util.Xml;
 
-import org.apache.http.HttpConnection;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -27,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -36,11 +33,15 @@ import ru.ifmo.md.lesson8.provider.WeatherContract;
 
 
 public class WeatherLoaderService extends IntentService {
-    public static final String ACTION_ADD_NEW_CITY = "ru.ifmo.md.lesson8.action.ADD_NEW_CITY";
+    public static final String ACTION_ADD_CITY_BY_NAME = "ru.ifmo.md.lesson8.action.ADD_CITY_BY_NAME";
+    public static final String ACTION_ADD_CITY_BY_COORD = "ru.ifmo.md.lesson8.action.ADD_CITY_BY_COORD";
     public static final String ACTION_UPDATE_CITY = "ru.ifmo.md.lesson8.action.UPDATE_CITY";
+    public static final String ACTION_UPDATE_ALL = "ru.ifmo.md.lesson8.action.UPDATE_ALL";
 
     public static final String EXTRA_CITY_NAME = "ru.ifmo.md.lesson8.extra.CITY_NAME";
     public static final String EXTRA_CITY_ID = "ru.ifmo.md.lesson8.extra.CITY_ID";
+    public static final String EXTRA_CITY_LATITUDE = "ru.ifmo.md.lesson8.extra.CITY_LATITUDE";
+    public static final String EXTRA_CITY_LONGITUDE = "ru.ifmo.md.lesson8.extra.CITY_LONGITUDE";
     public static final String EXTRA_CITY_WEATHER_ID = "ru.ifmo.md.lesson8.extra.CITY_WEATHER_ID";
     public static final String EXTRA_RECEIVER = "ru.ifmo.md.lesson8.extra.RECEIVER";
 
@@ -51,19 +52,27 @@ public class WeatherLoaderService extends IntentService {
     public static final long INTERVAL_TWELVE_HOURS = INTERVAL_HOUR * 12;
 
     private static final String SEARCH_FORMAT = "http://api.openweathermap.org/data/2.5/weather?q=%s&mode=xml&units=metric";
-    private static final String FORECAST_FORMAT = "http://api.openweathermap.org/data/2.5/forecast/daily?id=%s&mode=xml&units=metric&cnt=6";
+    private static final String FORECAST_FORMAT = "http://api.openweathermap.org/data/2.5/forecast/daily?id=%s&mode=xml&units=metric&cnt=5";
     private static final String CURRENT_FORMAT = "http://api.openweathermap.org/data/2.5/weather?id=%s&mode=xml&units=metric";
+    private static final String LOCATION_FORMAT = "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&mode=xml&units=metric";
 
     private ResultReceiver mReceiver;
 
 
     public static void startActionAddNewCity(Context context, String cityName) {
         Intent intent = new Intent(context, WeatherLoaderService.class);
-        intent.setAction(ACTION_ADD_NEW_CITY);
+        intent.setAction(ACTION_ADD_CITY_BY_NAME);
         intent.putExtra(EXTRA_CITY_NAME, cityName);
         context.startService(intent);
     }
 
+    public static void startActionAddNewCity(Context context, double latitude, double longitude) {
+        Intent intent = new Intent(context, WeatherLoaderService.class);
+        intent.setAction(ACTION_ADD_CITY_BY_COORD);
+        intent.putExtra(EXTRA_CITY_LATITUDE, latitude);
+        intent.putExtra(EXTRA_CITY_LONGITUDE, longitude);
+        context.startService(intent);
+    }
 
     public static void startActionUpdateCity(Context context, String cityId, String cityWeatherId, MyResultReceiver receiver) {
         Intent intent = new Intent(context, WeatherLoaderService.class);
@@ -76,8 +85,9 @@ public class WeatherLoaderService extends IntentService {
 
     public static void setServiceAlarm(Context context, boolean isOn) {
         Log.d("TAG", "setServiceAlarm: " + isOn);
-        Intent i = new Intent(context, WeatherLoaderService.class);
-        PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+        Intent intent = new Intent(context, WeatherLoaderService.class);
+        intent.setAction(ACTION_UPDATE_ALL);
+        PendingIntent pi = PendingIntent.getService(context, 0, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -99,6 +109,18 @@ public class WeatherLoaderService extends IntentService {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putLong("interval", interval)
+                .commit();
+    }
+
+    public static long readCurrentCity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong("current_city", 1);
+    }
+
+    public static void setCurrentCity(Context context, long cityId) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putLong("current_city", cityId)
                 .commit();
     }
 
@@ -126,19 +148,49 @@ public class WeatherLoaderService extends IntentService {
         if (intent != null) {
             mReceiver = intent.getParcelableExtra(EXTRA_RECEIVER);
             final String action = intent.getAction();
-            if (ACTION_ADD_NEW_CITY.equals(action)) {
-                final String cityName = intent.getStringExtra(EXTRA_CITY_NAME);
-                handleActionAddNewCity(cityName);
-            } else if (ACTION_UPDATE_CITY.equals(action)) {
-                final String cityId = intent.getStringExtra(EXTRA_CITY_ID);
-                final String cityWeatherId = intent.getStringExtra(EXTRA_CITY_WEATHER_ID);
-                handleActionUpdateCity(cityId, cityWeatherId);
+            switch (action) {
+                case ACTION_ADD_CITY_BY_NAME:
+                    final String cityName = intent.getStringExtra(EXTRA_CITY_NAME);
+                    Log.d("TAG", "Adding city by name: " + cityName);
+                    handleActionAddNewCity(cityName);
+                    break;
+                case ACTION_UPDATE_CITY:
+                    final String cityId = intent.getStringExtra(EXTRA_CITY_ID);
+                    final String cityWeatherId = intent.getStringExtra(EXTRA_CITY_WEATHER_ID);
+                    Log.d("TAG", "Updating city id=" + cityId + ", weatherId=" + cityWeatherId);
+                    handleActionUpdateCity(cityId, cityWeatherId);
+                    break;
+                case ACTION_ADD_CITY_BY_COORD:
+                    final double latitude = intent.getDoubleExtra(EXTRA_CITY_LATITUDE, 59.95);
+                    final double longitude = intent.getDoubleExtra(EXTRA_CITY_LONGITUDE, 30.316667);
+                    Log.d("TAG", "Adding city lat=" + latitude + ", lon=" + longitude);
+                    handleActionAddNewCity(latitude, longitude);
+                    break;
+                case ACTION_UPDATE_ALL:
+                    Log.d("TAG", "Updating all cities");
+                    handleActionUpdateAll();
+                    break;
             }
         }
     }
 
+    private void handleActionUpdateAll() {
+        Cursor cursor = getContentResolver().query(
+                WeatherContract.City.CONTENT_URI,
+                WeatherContract.City.ID_COLUMNS,
+                null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isBeforeFirst() && !cursor.isAfterLast()) {
+            final String cityId = Long.toString(cursor.getLong(cursor.getColumnIndex(WeatherContract.City._ID)));
+            final String cityWeatherId = Long.toString(cursor.getLong(cursor.getColumnIndex(WeatherContract.City.CITY_ID)));
+            Log.d("TAG", "Updating city with id=" + cityId + ", weatherId=" + cityWeatherId);
+            handleActionUpdateCity(cityId, cityWeatherId);
+            cursor.moveToNext();
+        }
+    }
+
     private void handleActionAddNewCity(String cityName) {
-        WeatherInfo weather = null;
+        WeatherInfo weather;
         try {
             weather = searchCity(cityName);
         } catch (IOException | SAXException e) {
@@ -146,6 +198,40 @@ public class WeatherLoaderService extends IntentService {
             // TODO: receiver
             return;
         }
+        addCity(weather);
+    }
+
+    private void handleActionUpdateCity(String cityId, String cityWeatherId) {
+        WeatherInfo weather;
+
+        try {
+            weather = loadWeather(cityWeatherId);
+        } catch (IOException | SAXException e) {
+            e.printStackTrace();
+            mReceiver.send(1, Bundle.EMPTY);
+            return;
+        }
+
+        ContentValues values = fillValues(weather);
+        getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
+
+        mReceiver.send(0, Bundle.EMPTY);
+    }
+
+    private void handleActionAddNewCity(double latitude, double longitude) {
+        WeatherInfo weather;
+        try {
+            weather = searchCity(latitude, longitude);
+        } catch (IOException | SAXException e) {
+            e.printStackTrace();
+            // TODO: receiver
+            return;
+        }
+        setCurrentCity(getApplicationContext(), weather.getCityId());
+        addCity(weather);
+    }
+
+    private void addCity(WeatherInfo weather) {
         Cursor cursor = getContentResolver().query(
                 WeatherContract.City.CONTENT_URI,
                 WeatherContract.City.ID_COLUMNS,
@@ -168,23 +254,6 @@ public class WeatherLoaderService extends IntentService {
         }
     }
 
-    private void handleActionUpdateCity(String cityId, String cityWeatherId) {
-        WeatherInfo weather;
-
-        try {
-            weather = loadWeather(cityWeatherId);
-        } catch (IOException | SAXException e) {
-            e.printStackTrace();
-            mReceiver.send(1, Bundle.EMPTY);
-            return;
-        }
-
-        ContentValues values = fillValues(weather);
-        getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
-
-        mReceiver.send(0, Bundle.EMPTY);
-    }
-
     private WeatherInfo searchCity(String cityName) throws IOException, SAXException {
         final String queryUrl;
         try {
@@ -193,6 +262,14 @@ public class WeatherLoaderService extends IntentService {
             e.printStackTrace();
             return null;
         }
+        Log.d("TAG", "Query: " + queryUrl);
+        WeatherInfo weather = WeatherParser.parseCurrent(getReader(queryUrl));
+        return weather;
+    }
+
+    private WeatherInfo searchCity(double latitude, double longitude) throws IOException, SAXException {
+        final String queryUrl;
+        queryUrl = String.format(LOCATION_FORMAT, latitude, longitude);
         Log.d("TAG", "Query: " + queryUrl);
         WeatherInfo weather = WeatherParser.parseCurrent(getReader(queryUrl));
         return weather;

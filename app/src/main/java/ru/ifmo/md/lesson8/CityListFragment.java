@@ -5,12 +5,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,12 +26,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import java.util.List;
+
 import ru.ifmo.md.lesson8.provider.WeatherContract;
 
 
 public class CityListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,MyContentObserver.Callbacks {
 
     private static final int LOADER_CITIES = 0;
+    private static final long UPDATE_FREQ = 1000 * 60 * 10;
 
     public static final String EXTRA_CITY_ID = "ru.ifmo.md.lesson8.weather.extra.CITY_ID";
 
@@ -54,7 +61,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
                 return new CursorLoader(
                         getActivity(),
                         WeatherContract.City.CONTENT_URI,
-                        WeatherContract.City.NAME_COLUMNS,
+                        WeatherContract.City.ALL_COLUMNS,
                         null, null, null);
             default:
                 throw new UnsupportedOperationException("Unknown loader");
@@ -130,12 +137,67 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             @Override
             public void bindView(View view, Context context, Cursor cursor) {
                 final String city = cursor.getString(cursor.getColumnIndex(WeatherContract.City.CITY_NAME));
-                ((TextView) view.findViewById(android.R.id.text1)).setText(city);
+                final TextView textView = (TextView) view.findViewById(android.R.id.text1);
+                textView.setText(city);
+                final long cityWeatherId = cursor.getLong(cursor.getColumnIndex(WeatherContract.City.CITY_ID));
+                final long currentCityWeatherId = WeatherLoaderService.readCurrentCity(getActivity());
+                if (cityWeatherId == currentCityWeatherId) {
+                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.ic_menu_mylocation, 0);
+                }
             }
         };
         setListAdapter(mAdapter);
 
         getLoaderManager().initLoader(LOADER_CITIES, Bundle.EMPTY, this);
+
+        final long lastUpdate = getLastUpdate(getActivity());
+        if (System.currentTimeMillis() - lastUpdate > UPDATE_FREQ) {
+            double[] coordinates = getLastLocation();
+            if (coordinates != null) {
+                setLastUpdate(getActivity(), System.currentTimeMillis());
+                WeatherLoaderService.startActionAddNewCity(getActivity(), coordinates[0], coordinates[1]);
+            }
+        }
+    }
+
+    private double[] getLastLocation() {
+        LocationManager lm = (LocationManager)  getActivity().getSystemService(Context.LOCATION_SERVICE);
+        List<String> providers = lm.getProviders(true);
+        Location location = null;
+
+        for (int i = providers.size() - 1; i >= 0; i--) {
+            Location lt = lm.getLastKnownLocation(providers.get(i));
+            if (lt != null) {
+                Log.d("TAG", "provider: " + lt.getProvider());
+                Log.d("TAG", "latitude: " + lt.getLatitude());
+                Log.d("TAG", "longitude: " + lt.getLongitude());
+                location = lt;
+            }
+        }
+
+        double[] coordinates = null;
+        if (location != null) {
+            coordinates = new double[2];
+            coordinates[0] = location.getLatitude();
+            coordinates[1] = location.getLongitude();
+            if (Math.abs(coordinates[0] - 59.89) < 0.3 && Math.abs(30.26 - coordinates[1]) < 0.3) {
+                coordinates[0] = 59.89;
+                coordinates[1] = 30.26;
+            }
+        }
+        return coordinates;
+    }
+
+    private static long getLastUpdate(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong("last_update", 0);
+    }
+
+    public static void setLastUpdate(Context context, long lastUpdate) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putLong("last_update", lastUpdate)
+                .commit();
     }
 
     @Override
