@@ -181,6 +181,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
                 Log.d("TAG", "latitude: " + lt.getLatitude());
                 Log.d("TAG", "longitude: " + lt.getLongitude());
                 location = lt;
+                break;
             }
         }
 
@@ -189,10 +190,6 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             coordinates = new double[2];
             coordinates[0] = location.getLatitude();
             coordinates[1] = location.getLongitude();
-            if (Math.abs(coordinates[0] - 59.89) < 0.3 && Math.abs(30.26 - coordinates[1]) < 0.3) {
-                coordinates[0] = 59.89;
-                coordinates[1] = 30.27;
-            }
         }
         return coordinates;
     }

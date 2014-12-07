@@ -226,13 +226,18 @@ public class WeatherLoaderService extends IntentService {
     private void handleActionAddNewCity(double latitude, double longitude) {
         WeatherInfo weather;
         try {
-            weather = searchCity(latitude, longitude);
+            if (Math.abs(latitude - 59.89) < 0.3 && Math.abs(30.26 - longitude) < 0.3) {
+                weather = searchCity("Saint petersburg");
+            } else {
+                weather = searchCity(latitude, longitude);
+            }
         } catch (IOException | SAXException e) {
             e.printStackTrace();
             // TODO: receiver
             return;
         }
         addCity(weather);
+        setCurrentCity(getApplicationContext(), weather.getCityId());
     }
 
     private void addCity(WeatherInfo weather) {
@@ -252,7 +257,6 @@ public class WeatherLoaderService extends IntentService {
             e.printStackTrace();
             return;
         }
-        setCurrentCity(getApplicationContext(), weather.getCityId());
         ContentValues values = fillValues(weather);
         if (count > 0) {
             getContentResolver().update(WeatherContract.City.buildCityUri(cityId), values, null, null);
