@@ -108,6 +108,9 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
             case R.id.action_add:
                 showCitySelectDialog();
                 return true;
+            case R.id.action_set_update:
+                showUpdateIntervalDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -245,6 +248,54 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
 
                     }
                 });
+        builder.show();
+    }
+
+    private void showUpdateIntervalDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle("Update interval")
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .setSingleChoiceItems(R.array.update_interval_choices,
+                        WeatherLoaderService.getIntervalIndex(getActivity()),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int index) {
+                                boolean isAlarmOn = WeatherLoaderService.isServiceAlarmOn(getActivity());
+                                if (index == 0) {
+                                    if (isAlarmOn) {
+                                        WeatherLoaderService.setServiceAlarm(getActivity(), false);
+                                    }
+                                } else {
+                                    final long interval;
+                                    switch (index) {
+                                        case 1:
+                                            interval = WeatherLoaderService.INTERVAL_HOUR;
+                                            break;
+                                        case 2:
+                                            interval = WeatherLoaderService.INTERVAL_TWO_HOURS;
+                                            break;
+                                        case 3:
+                                            interval = WeatherLoaderService.INTERVAL_SIX_HOURS;
+                                            break;
+                                        case 4:
+                                            interval = WeatherLoaderService.INTERVAL_TWELVE_HOURS;
+                                            break;
+                                        default:
+                                            interval = WeatherLoaderService.INTERVAL_NONE;
+                                            break;
+                                    }
+                                    WeatherLoaderService.setInterval(getActivity(), interval);
+                                    WeatherLoaderService.setServiceAlarm(getActivity(), true);
+                                }
+                                dialogInterface.dismiss();
+                            }
+                        });
         builder.show();
     }
 }

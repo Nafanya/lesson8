@@ -2,8 +2,13 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="ru.ifmo.md.lesson8.TestActivity">
+
     <item android:id="@+id/action_add"
           android:icon="@android:drawable/ic_menu_add"
-          app:showAsAction="always"
-          android:title="@string/action_add"/>
+          android:title="@string/action_add"
+          app:showAsAction="ifRoom|withText"/>
+
+    <item android:id="@+id/action_set_update"
+          android:title="@string/action_set_update"
+          app:showAsAction="never" />
 </menu>

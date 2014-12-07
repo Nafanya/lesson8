@@ -18,10 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -223,9 +221,7 @@ public class CityDetailFragment extends Fragment implements LoaderManager.Loader
     }
 
     private String toTitleCase(String s) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Character.toUpperCase(s.charAt(0))).append(s.subSequence(1, s.length()).toString().toLowerCase());
-        return sb.toString();
+        return String.valueOf(Character.toUpperCase(s.charAt(0))) + s.subSequence(1, s.length()).toString().toLowerCase();
     }
 
     private int getImageById(String icon) {

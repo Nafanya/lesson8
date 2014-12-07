@@ -1,6 +1,8 @@
 package ru.ifmo.md.lesson8;
 
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Context;
@@ -8,6 +10,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.preference.PreferenceManager;
 import android.sax.Element;
 import android.sax.EndElementListener;
 import android.sax.RootElement;
@@ -41,6 +44,12 @@ public class WeatherLoaderService extends IntentService {
     public static final String EXTRA_CITY_WEATHER_ID = "ru.ifmo.md.lesson8.extra.CITY_WEATHER_ID";
     public static final String EXTRA_RECEIVER = "ru.ifmo.md.lesson8.extra.RECEIVER";
 
+    public static final long INTERVAL_NONE = -1;
+    public static final long INTERVAL_HOUR = AlarmManager.INTERVAL_HOUR;
+    public static final long INTERVAL_TWO_HOURS = INTERVAL_HOUR * 2;
+    public static final long INTERVAL_SIX_HOURS = INTERVAL_HOUR * 6;
+    public static final long INTERVAL_TWELVE_HOURS = INTERVAL_HOUR * 12;
+
     private static final String SEARCH_FORMAT = "http://api.openweathermap.org/data/2.5/weather?q=%s&mode=xml&units=metric";
     private static final String FORECAST_FORMAT = "http://api.openweathermap.org/data/2.5/forecast/daily?id=%s&mode=xml&units=metric&cnt=6";
     private static final String CURRENT_FORMAT = "http://api.openweathermap.org/data/2.5/weather?id=%s&mode=xml&units=metric";
@@ -63,6 +72,49 @@ public class WeatherLoaderService extends IntentService {
         intent.putExtra(EXTRA_CITY_ID, cityId);
         intent.putExtra(EXTRA_CITY_WEATHER_ID, cityWeatherId);
         context.startService(intent);
+    }
+
+    public static void setServiceAlarm(Context context, boolean isOn) {
+        Log.d("TAG", "setServiceAlarm: " + isOn);
+        Intent i = new Intent(context, WeatherLoaderService.class);
+        PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        if (isOn) {
+            alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(),
+                    readInterval(context), pi);
+        } else {
+            alarmManager.cancel(pi);
+            pi.cancel();
+        }
+    }
+
+    private static long readInterval(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong("interval", INTERVAL_HOUR);
+    }
+
+    public static void setInterval(Context context, long interval) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putLong("interval", interval)
+                .commit();
+    }
+
+    public static boolean isServiceAlarmOn(Context context) {
+        Intent i = new Intent(context, WeatherLoaderService.class);
+        PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
+        return pi != null;
+    }
+
+    public static int getIntervalIndex(Context context) {
+        final long interval = readInterval(context);
+        if (interval == INTERVAL_HOUR) return 1;
+        if (interval == INTERVAL_TWO_HOURS) return 2;
+        if (interval == INTERVAL_SIX_HOURS) return 3;
+        if (interval == INTERVAL_TWELVE_HOURS) return 4;
+        return 0;
     }
 
     public WeatherLoaderService() {
