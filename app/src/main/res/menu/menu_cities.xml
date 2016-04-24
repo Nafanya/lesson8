@@ -6,7 +6,7 @@
     <item android:id="@+id/action_add"
           android:icon="@android:drawable/ic_menu_add"
           android:title="@string/action_add"
-          app:showAsAction="ifRoom|withText"/>
+          app:showAsAction="never"/>
 
     <item android:id="@+id/action_set_update"
           android:title="@string/action_set_update"
@@ -15,5 +15,5 @@
     <item android:id="@+id/action_update_all"
           android:icon="@android:drawable/ic_menu_rotate"
           android:title="@string/action_update_all"
-          app:showAsAction="ifRoom|withText"/>
+          app:showAsAction="never"/>
 </menu>

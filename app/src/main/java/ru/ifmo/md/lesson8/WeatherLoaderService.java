@@ -52,10 +52,13 @@ public class WeatherLoaderService extends IntentService {
     public static final long INTERVAL_SIX_HOURS = INTERVAL_HOUR * 6;
     public static final long INTERVAL_TWELVE_HOURS = INTERVAL_HOUR * 12;
 
-    private static final String SEARCH_FORMAT = "http://api.openweathermap.org/data/2.5/weather?q=%s&mode=xml&units=metric";
-    private static final String FORECAST_FORMAT = "http://api.openweathermap.org/data/2.5/forecast/daily?id=%s&mode=xml&units=metric&cnt=5";
-    private static final String CURRENT_FORMAT = "http://api.openweathermap.org/data/2.5/weather?id=%s&mode=xml&units=metric";
-    private static final String LOCATION_FORMAT = "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&mode=xml&units=metric";
+    private static final String API_PREFIX = "http://api.openweathermap.org/data/2.5/";
+    private static final String API_APP_ID = "appid=59201a3d46b064e80c52c98a22d54b15";
+    private static final String SEARCH_FORMAT = API_PREFIX + "weather?q=%s&mode=xml&units=metric&" + API_APP_ID;
+    private static final String FORECAST_FORMAT = API_PREFIX + "forecast/daily?id=%s&mode=xml&units=metric&cnt=5&" + API_APP_ID;
+    private static final String CURRENT_FORMAT = API_PREFIX + "weather?id=%s&mode=xml&units=metric&"  + API_APP_ID;
+    private static final String LOCATION_FORMAT = API_PREFIX + "weather?lat=%f&lon=%f&mode=xml&units=metric&" + API_APP_ID;
+
 
     //private ResultReceiver mReceiver;
 

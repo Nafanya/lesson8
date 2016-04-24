@@ -146,7 +146,7 @@ public class CityListFragment extends ListFragment implements LoaderManager.Load
                 final long cityWeatherId = cursor.getLong(cursor.getColumnIndex(WeatherContract.City.CITY_ID));
                 final long currentCityWeatherId = WeatherLoaderService.readCurrentCity(getActivity());
                 if (cityWeatherId == currentCityWeatherId) {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.ic_menu_mylocation, 0);
+                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.mapmarker1, 0);
                 }
             }
         };
