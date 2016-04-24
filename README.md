@@ -1,3 +1,11 @@
+# Screenshots
+
+<img src="https://github.com/Nafanya/weather/blob/lesson10/screenshots/cities.jpg" width="200">
+
+<img src="https://github.com/Nafanya/weather/blob/lesson10/screenshots/main.jpg" width="200">
+
+<img src="https://github.com/Nafanya/weather/blob/lesson10/screenshots/forecast.jpg" width="200">
+
 Материалы восьмой лекции:
 =======
  - https://yadi.sk/d/xyAJA9zacsyt7
